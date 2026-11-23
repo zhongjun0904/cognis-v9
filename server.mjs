@@ -119,7 +119,7 @@ async function askJSON(system, data, maxTokens = 1100) {
   return parseJSON(raw);
 }
 
-}
+
 /* V6 strategy taxonomy: teaching methods, not diagnoses or validated competence. */
 const INTERVENTIONS={
   research_clarification:'梳理研究对象、变量、范围及可观察问题',
