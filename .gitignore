@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+.dev.vars
+node_modules/
+.DS_Store
+*.log
+.vscode/
+__pycache__/
+.validate_*.js
+preview_*.png
+patch_*.py

@@ -1,0 +1,9 @@
+{
+  "name": "cognis-research-coach",
+  "version": "9.0.0",
+  "type": "module",
+  "private": true,
+  "description": "COGNIS 研究思维训练 — GitHub Pages 前端 + OpenAI Responses API 后端",
+  "engines": {"node": ">=20"},
+  "scripts": {"start":"node server.mjs", "test":"node tests/test_integration.mjs"}
+}

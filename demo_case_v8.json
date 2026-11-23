@@ -1,0 +1,63 @@
+{
+  "format": "cognis-demo-v8",
+  "fictional": true,
+  "scenario": "非合作空间目标多星协同观测研究",
+  "note": "全部虚构，旨在演示完整流程，不代表真实研究、AI诊断或正式教师评价",
+  "input": {
+    "researchStage": "design",
+    "studentStatement": "我想让三颗卫星从不同视角观测翻滚的失效卫星，提高质心定位精度。我觉得观测卫星越多，定位结果一定越好，但还没有做同条件对照。"
+  },
+  "reasoning": {
+    "claim": "三颗卫星可能降低目标质心位置估计误差",
+    "evidence": "单星五次仿真、多星一次试算且参数尚未统一",
+    "assumption": "默认同步误差和配准误差可忽略",
+    "gap": "未建立同条件可比较误差基准",
+    "uncertainty": "是否控制同步偏差、相机分辨率与观测几何"
+  },
+  "round1": {
+    "role": "学伴/方法学家",
+    "prompts": 3,
+    "studentRevision": "多星可能降低特定工况下质心 RMSE；若新增误差使 RMSE 反而升高，原假设不成立。"
+  },
+  "round2": {
+    "scenario": "加入第四颗观测卫星，定位精度一定继续提高",
+    "expected": "识别未经证实的线性叠加假设；提出与新增误差相关的对照"
+  },
+  "round3": {
+    "targetScenario": "平台访问量增加就意味着改革一定提高学习质量",
+    "negativeControl": "访问量上升但研究者暂不归因，等待进一步学习表现比较"
+  },
+  "practice": {
+    "plan": "固定观测条件比较1/3/4星方案的 RMSE",
+    "observations": [
+      {
+        "kind": "虚构示例",
+        "rmse_m": 2.1,
+        "conditions": "单星基线"
+      },
+      {
+        "kind": "虚构示例",
+        "rmse_m": 1.8,
+        "conditions": "三星低同步偏差"
+      },
+      {
+        "kind": "虚构示例",
+        "rmse_m": 2.4,
+        "conditions": "三星高同步偏差"
+      }
+    ]
+  },
+  "teacherFeedback": {
+    "illustrative": true,
+    "comment": "需要对同步误差、观测几何和特征配准参数分别做敏感性分析并重复实验"
+  },
+  "growth": {
+    "progression": [
+      "修正初始判断",
+      "提出可推翻的验证计划",
+      "记录反证条件",
+      "根据指导修订研究行动"
+    ],
+    "isAbilityScore": false
+  }
+}
