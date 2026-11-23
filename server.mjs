@@ -109,9 +109,16 @@ function parseJSON(s){
     return JSON.parse(t.slice(a,b+1));
   }
 }
-async function askJSON(system,data,maxTokens=1100){
-  const raw=await ask(system+'\n严格返回单个 JSON 对象，不要 Markdown 围栏和补充说明。',clean(data),{maxTokens,jsonMode:true});
+
+async function askJSON(system, data, maxTokens = 1100) {
+  const raw = await ask(
+    system + '\n严格返回单个 JSON 对象，不要 Markdown 围栏和补充说明。',
+    '请根据以下数据返回有效的 JSON 对象，只输出 JSON：\n' + clean(data),
+    { maxTokens, jsonMode: true }
+  );
   return parseJSON(raw);
+}
+
 }
 /* V6 strategy taxonomy: teaching methods, not diagnoses or validated competence. */
 const INTERVENTIONS={
