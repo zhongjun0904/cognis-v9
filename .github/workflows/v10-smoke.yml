@@ -1,0 +1,23 @@
+name: V10 smoke checks
+on:
+  push:
+    branches: [feature/v10-knowledge-thinking-tree]
+  pull_request:
+    paths:
+      - "v10.js"
+      - "v10.css"
+      - "v10.html"
+      - "server.mjs"
+      - "tests/v10_smoke.mjs"
+      - "package.json"
+jobs:
+  v10:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm run test:v10
