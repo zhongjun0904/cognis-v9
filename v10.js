@@ -78,7 +78,21 @@ const b=document.createElement('button');b.id='v10HistoryOpen';b.type='button';b
 function growthAction(){const p=$('cxPage');if(!p||p.querySelector('#v10GrowthOpen')||!$('cxCenter')?.classList.contains('open'))return;const title=p.querySelector('.cx-page-title');if(!title||!title.textContent.includes('一步步想清楚'))return;const b=document.createElement('button');b.className='cx-btn';b.id='v10GrowthOpen';b.textContent='✦ 查看思维决策路径';b.onclick=()=>open();title.insertAdjacentElement('afterend',b);}
 function onMessage(event){const m=event.detail?.message;if(!m||m.demo||!activeSession())return;if(studentOnly(m)){knowledgePending=/(不懂|不理解|不了解|不清楚|没学过|知识盲区|什么是|什么意思|讲解|解释一下|基本原理|基础知识|如何理解)/.test(m.text);return;}
 if(!/服务未能完成回复|连接异常/.test(m.text||'')){if(knowledgePending){knowledgePending=false;setTimeout(()=>learn(false),150)}const n=(data().messages||[]).filter(studentOnly).length;if(n>=2&&n%2===0&&ai())setTimeout(()=>refresh(false),300);}}
-function init(){controls();quick();document.addEventListener('cognis-strategy:open',()=>setTimeout(()=>{controls();quick();badge()},25));document.addEventListener('cognis-v10-message',onMessage);
+
+let observedLast='';
+function watchMessageChanges(){
+ const root=$('sfThread');if(!root)return;
+ const existing=(data().messages||[]).at(-1);observedLast=existing?(existing.ts+':'+existing.agent+':'+existing.text.slice(0,40)):'';
+ let scheduled=false;
+ const run=()=>{scheduled=false;
+  const latest=(data().messages||[]).at(-1);if(!latest)return;
+  const key=latest.ts+':'+latest.agent+':'+latest.text.slice(0,40);
+  if(key===observedLast)return;observedLast=key;
+  onMessage({detail:{message:latest}});
+ };
+ new MutationObserver(()=>{if(scheduled)return;scheduled=true;queueMicrotask(run)}).observe(root,{childList:true,subtree:true});
+}
+function init(){controls();quick();watchMessageChanges();document.addEventListener('cognis-strategy:open',()=>setTimeout(()=>{controls();quick();badge()},25));document.addEventListener('cognis-v10-message',onMessage);
 const quickRoot=$('sfQuick');if(quickRoot)new MutationObserver(quick).observe(quickRoot,{childList:true});const page=$('cxPage');if(page)new MutationObserver(()=>{historyAction();growthAction()}).observe(page,{childList:true,subtree:true});document.addEventListener('cognis-history-updated',badge);}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
