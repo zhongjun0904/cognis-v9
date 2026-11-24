@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>COGNIS V10 · 知识支持与科研思维路径</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+#app{height:100%;width:100%;border:0;display:block;background:#f5f9ff}
+#load{position:fixed;inset:0;background:linear-gradient(115deg,#eff7ff,#fff);display:flex;justify-content:center;align-items:center;z-index:5;color:#235489;font-size:16px}
+#load small{font-size:12px;color:#7190ad;display:block;margin-top:12px}
+#load.hidden{display:none}
+</style>
+</head>
+<body>
+<div id="load" role="status">正在打开 COGNIS V10…<small>载入既有科研讨论及增强功能</small></div>
+<iframe id="app" title="COGNIS V10 科研探索平台" src="./index.html" allow="clipboard-write"></iframe>
+<script>
+const frame=document.getElementById('app'),loader=document.getElementById('load');
+frame.addEventListener('load',()=>{
+ try{
+  const doc=frame.contentDocument;
+  if(!doc||!doc.body)throw new Error('无法读取同源页面');
+  const css=doc.createElement('link');css.rel='stylesheet';css.href='./v10.css';doc.head.appendChild(css);
+  const script=doc.createElement('script');script.src='./v10.js';script.onload=()=>loader.classList.add('hidden');
+  script.onerror=()=>{loader.textContent='V10 增强功能加载失败；可返回 V9 继续使用。';};
+  doc.body.appendChild(script);
+ }catch(error){loader.textContent='加载失败：'+error.message;}
+});
+</script>
+</body></html>
