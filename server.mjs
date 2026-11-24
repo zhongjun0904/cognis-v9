@@ -159,6 +159,26 @@ function quoteItems(items,original,{allowInferred=true,max=4}={}){
 }
 
 const routes={
+ async 'knowledge-support'(d){
+  const q=cap(d.question,2600).trim();if(!q)throw new HttpError(400,'请先描述问题');
+  const conversation=(Array.isArray(d.conversation)?d.conversation:[]).slice(-12).map(x=>({role:x.role==='student'?'student':'assistant',text:cap(x.text,1700)}));
+  const a=await askJSON(POLICY+'\n你是科研学习中的知识支持助手。只根据学生当前真实问题解释所欠缺的知识，不把缺少知识认定为能力缺陷。若用户没有知识疑问且未主动请求，则返回 needsHelp:false。不能编造教材章节、论文、网址和实验数据；没有检索工具，不能声称已经检索学术资源。用简明准确语言解释概念、提供小例子、给出可自行检索的相关知识词。严格返回 JSON：{"needsHelp":true,"concept":"概念","explanation":"准确解释与小例子","whyRelevant":"与当前问题的关联","related":["先修知识"],"returnQuestion":"把知识应用回科研问题的一句话"}。',
+    {topic:cap(d.topic,1300),question:q,force:d.force===true,conversation},1700);
+  return {needsHelp:a.needsHelp!==false,concept:cap(a.concept,100),explanation:cap(a.explanation,950),whyRelevant:cap(a.whyRelevant,350),related:(Array.isArray(a.related)?a.related:[]).slice(0,4).map(x=>cap(x,90)).filter(Boolean),returnQuestion:cap(a.returnQuestion,180)};
+ },
+ async 'thinking-update'(d){
+  const convo=(Array.isArray(d.conversation)?d.conversation:[]).slice(-30).map(x=>({role:x.role==='student'?'student':'assistant',text:cap(x.text,2300),ts:Number(x.ts)||0}));
+  const students=convo.filter(x=>x.role==='student');if(!students.length)return {nodes:[]};
+  const prev=(Array.isArray(d.existingNodes)?d.existingNodes:[]).slice(-22).map(x=>({id:cap(x.id,110),type:cap(x.type,35),title:cap(x.title,120),quote:cap(x.quote,370)}));
+  const a=await askJSON(POLICY+'\n你是学生科研思考过程记录助手。依据学生原话提取关键判断、证据、假设、疑问、思考修正及下一步行动，不评定能力高低。每个新节点必须引用学生原话中连续出现的至少4个字符，不可引用助手的话充当学生证据。只有学生明确修正了观点才使用 revision。不得编造实验数据、研究结论与文献。与已有节点去重；每次最多新建2个节点，没有充分依据返回空数组。只输出 JSON：{"nodes":[{"type":"claim|question|evidence|assumption|decision|revision|action","title":"短标题","detail":"解释，少于120字","quote":"学生的连续原文","parentId":null,"relation":"supports|challenges|revises|leads_to"}]}。',
+   {topic:cap(d.topic,1200),conversation:convo,existingNodes:prev},1700);
+  const kinds=new Set(['claim','question','evidence','assumption','decision','revision','action']),rels=new Set(['supports','challenges','revises','leads_to']);
+  return {nodes:(Array.isArray(a.nodes)?a.nodes:[]).slice(0,2).filter(x=>x&&kinds.has(x.type)).map(x=>{
+   const quote=cap(x.quote,350).trim(),title=cap(x.title,75).trim();if(quote.length<4||!title||!students.some(m=>m.text.includes(quote)))return null;
+   const parentId=cap(x.parentId,110);return {type:x.type,title,detail:cap(x.detail,550),quote,parentId:prev.some(n=>n.id===parentId)?parentId:null,relation:rels.has(x.relation)?x.relation:'leads_to'};
+  }).filter(Boolean)};
+ },
+
  async strategy(d){
   const dialogue=(Array.isArray(d.conversation)?d.conversation:[]).slice(-14).filter(x=>x&&typeof x==='object')
     .map(x=>({role:x.role==='student'?'student':'assistant',agent:cap(x.agent,30),text:cap(x.text,2000)}));
